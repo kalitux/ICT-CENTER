@@ -1,0 +1,1 @@
+web: gunicorn ict_app:app

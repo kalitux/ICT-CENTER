@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><title>ICT Command Center</title>
+<style>
+  body { background:#111; color:#f0f0f0; font-family:Arial; padding:20px; }
+  h1, h3 { color:#00ffc8; text-align:center; }
+  .killzone { margin-bottom:20px; font-weight:bold; }
+  table { width:100%; border-collapse:collapse; margin:20px 0; }
+  th, td { padding:10px; text-align:center; border:1px solid #333; }
+  th { background:#222; }
+  .status-box { padding:5px 10px; border-radius:4px; color:#fff; }
+  .green { background:#006400; } .yellow { background:#b8860b; } .red { background:#8b0000; }
+  .collapsible { background:#222; color:#fff; cursor:pointer; padding:10px; border:none;
+                 width:100%; text-align:left; outline:none; margin-top:10px; }
+  .active, .collapsible:hover { background:#444; }
+  .content { padding:10px 18px; display:none; background:#1a1a1a; }
+</style>
+</head>
+<body>
+  <h1>CHF ICT Command Center – Live</h1>
+  <h3>Killzone Status: {{ in_killzone() }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Pair</th><th>1H Bias</th><th>30M Bias</th><th>15M Setup</th>
+        <th>FVG</th><th>Order Block</th><th>SMT</th><th>MACD</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in dashboard_data %}
+      <tr>
+        <td>{{ row.pair }}</td>
+        <td>{{ row.bias1h }}</td>
+        <td>{{ row.thirty }}</td>
+        <td>{{ row.setup15m }}</td>
+        <td>{{ row.fvg }}</td>
+        <td>{{ row.ob }}</td>
+        <td>{{ row.smt }}</td>
+        <td>
+          {% for e in row.macd %}
+            <div style="font-size:0.9em; line-height:1.1em;">{{ e }}</div>
+          {% endfor %}
+        </td>
+        <td>
+          <span class="status-box
+            {% if row.status.startswith('🟢') %}green
+            {% elif row.status.startswith('🟡') %}yellow
+            {% else %}red{% endif %}">
+            {{ row.status }}
+          </span>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>🔗 CHF News Feed</h3>
+  <ul>
+    {% for title, url in news %}
+      <li><a href="{{ url }}" target="_blank" style="color:#00bfff;" title="{{ title }}">{{ title }}</a></li>
+    {% endfor %}
+  </ul>
+
+  {% for ev in market_events %}
+    <button class="collapsible">📊 Market Reaction: {{ ev.event }}</button>
+    <div class="content">
+      <h4>Pair Reactions:</h4><ul>
+        {% for r in ev.reactions %}<li><b>{{r.pair}}</b>: {{r.reaction}}</li>{% endfor %}
+      </ul>
+      <h4>Reasons:</h4>
+      <table>
+        <tr><th>Reason</th><th>Explanation</th></tr>
+        {% for rs in ev.reasons %}<tr><td>{{rs.reason}}</td><td>{{rs.explanation}}</td></tr>{% endfor %}
+      </table>
+    </div>
+  {% endfor %}
+
+<script>
+  var coll = document.getElementsByClassName("collapsible");
+  for (let i = 0; i < coll.length; i++) {
+    coll[i].onclick = function() {
+      this.classList.toggle("active");
+      let content = this.nextElementSibling;
+      content.style.display = (content.style.display === "block") ? "none" : "block";
+    }
+  }
+</script>
+</body>
+</html>
