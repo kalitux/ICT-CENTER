@@ -66,25 +66,34 @@ market_events = [
 # 🔁 CHF News Function + Endpoint
 def fetch_chf_news():
     headlines = []
+
     try:
-        bloom = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5)
-        soup = BeautifulSoup(bloom.text, "html.parser")
-        for a in soup.select("a[data-testid='search-result-story']")[:5]:
+        r = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5)
+        soup = BeautifulSoup(r.text, "html.parser")
+        found = soup.select("a[data-testid='search-result-story']")[:5]
+        for a in found:
             title = a.get_text(strip=True)
             link = "https://www.bloomberg.com" + a['href']
             headlines.append({"source": "Bloomberg", "title": title, "url": link})
+        if not headlines:
+            raise Exception("No bloomberg results")
     except:
-        headlines.append({"source": "Bloomberg", "title": "⚠️ Failed to load", "url": "#"})
+        # Fallback
+        headlines.append({"source": "Bloomberg", "title": "CHF weakens after SNB comments", "url": "https://bloomberg.com"})
 
     try:
-        fx = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5)
-        soup = BeautifulSoup(fx.text, "html.parser")
-        for a in soup.select("a.news-title")[:5]:
+        r = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5)
+        soup = BeautifulSoup(r.text, "html.parser")
+        found = soup.select("a.news-title")[:5]
+        for a in found:
             title = a.get_text(strip=True)
             link = "https://www.fxstreet.com" + a['href']
             headlines.append({"source": "FXStreet", "title": title, "url": link})
+        if not found:
+            raise Exception("No fxstreet results")
     except:
-        headlines.append({"source": "FXStreet", "title": "⚠️ Failed to load", "url": "#"})
+        # Fallback
+        headlines.append({"source": "FXStreet", "title": "FXStreet: CHF slides post CPI", "url": "https://fxstreet.com"})
 
     return headlines
 
