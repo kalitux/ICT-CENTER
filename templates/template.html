@@ -1,19 +1,201 @@
-<h3>📰 CHF News Feed</h3>
-<button onclick="refreshNews()">⏱️ Refresh News</button>
-<ul id="news-list"></ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ICT Command Center</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
 
-<script>
-function refreshNews() {
-  fetch("/get_news")
-    .then(res => res.json())
-    .then(data => {
-      const newsList = document.getElementById("news-list");
-      newsList.innerHTML = "";
-      data.forEach(item => {
-        let li = document.createElement("li");
-        li.innerHTML = `<b>[${item.source}]</b> <a href="${item.url}" target="_blank">${item.title}</a>`;
-        newsList.appendChild(li);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background-color: #1e1e1e;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #2c2c2c;
+      color: #f5f5f5;
+    }
+
+    button.collapsible {
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    h1, h2 {
+      color: #f5f5f5;
+    }
+
+    a {
+      color: #4fc3f7;
+      text-decoration: none;
+    }
+
+    .news-item {
+      margin-bottom: 10px;
+    }
+
+    .refresh-button {
+      background-color: #0077cc;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .refresh-button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 ICT Command Center</h1>
+
+  <table>
+    <tr>
+      <th>Pair</th>
+      <th>1H Bias</th>
+      <th>30M Bias</th>
+      <th>15M Setup</th>
+      <th>FVG</th>
+      <th>Order Block</th>
+      <th>SMT</th>
+      <th>MACD Divergence</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td>USD/CHF</td>
+      <td>🔵 Bullish</td>
+      <td>🟠 Bearish</td>
+      <td>—</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Confirmed</td>
+      <td>🔵 Bullish</td>
+      <td>Wait</td>
+    </tr>
+  </table>
+
+  <!-- 📊 Market Reaction Panels -->
+  <button class="collapsible">📊 Market Reaction: Swiss National Bank Rate Cut</button>
+  <div class="content">
+    <h4>Pair Reactions:</h4>
+    <ul>
+      <li><b>USD/CHF</b>: 🚀 Goes up</li>
+      <li><b>EUR/CHF</b>: 🚀 Goes up</li>
+      <li><b>CHF/JPY</b>: 📉 Goes down</li>
+    </ul>
+    <h4>Reasons:</h4>
+    <table>
+      <tr><th>Reason</th><th>Explanation</th></tr>
+      <tr><td>📉 Lower Yield</td><td>Rate cut = lower returns on CHF.</td></tr>
+      <tr><td>💸 Capital Outflows</td><td>Investors shift to higher yields.</td></tr>
+      <tr><td>📊 Dovish SNB</td><td>Central bank stimulating economy.</td></tr>
+      <tr><td>🏦 Carry Trade</td><td>CHF shorting becomes cheaper.</td></tr>
+    </table>
+  </div>
+
+  <button class="collapsible">📊 Market Reaction: US CPI Above Expectations</button>
+  <div class="content">
+    <h4>Pair Reactions:</h4>
+    <ul>
+      <li><b>USD/JPY</b>: 🚀 Goes up</li>
+      <li><b>EUR/USD</b>: 📉 Goes down</li>
+      <li><b>Gold/USD</b>: 📉 Goes down</li>
+    </ul>
+    <h4>Reasons:</h4>
+    <table>
+      <tr><th>Reason</th><th>Explanation</th></tr>
+      <tr><td>🔺 Higher Inflation</td><td>Boosts expectations of Fed rate hikes.</td></tr>
+      <tr><td>💰 Bond Sell-Off</td><td>Rising yields favor USD.</td></tr>
+      <tr><td>🧭 Fed Hawkish</td><td>Tighter policy outlook increases USD strength.</td></tr>
+    </table>
+  </div>
+
+  <button class="collapsible">📊 Market Reaction: Geopolitical Risk – Israel–Iran Conflict</button>
+  <div class="content">
+    <h4>Pair Reactions:</h4>
+    <ul>
+      <li><b>Gold/USD</b>: 🚀 Goes up</li>
+      <li><b>USD/JPY</b>: 📉 Goes down</li>
+      <li><b>Oil/USD</b>: 🚀 Goes up</li>
+    </ul>
+    <h4>Reasons:</h4>
+    <table>
+      <tr><th>Reason</th><th>Explanation</th></tr>
+      <tr><td>☢️ War Risk Premium</td><td>Gold & oil spike on uncertainty.</td></tr>
+      <tr><td>🛡️ Safe Haven Bid</td><td>JPY and Gold gain strength.</td></tr>
+      <tr><td>⛽ Oil Supply Fears</td><td>Middle East tension lifts crude prices.</td></tr>
+    </table>
+  </div>
+
+  <!-- 📰 CHF News Feed -->
+  <h2>📰 CHF News Feed</h2>
+  <button class="refresh-button" onclick="loadNews()">⏱️ Refresh News</button>
+  <div id="news-feed" style="margin-top:15px;"></div>
+
+  <script>
+    // Collapsible sections
+    var coll = document.getElementsByClassName("collapsible");
+    for (var i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
       });
-    });
-}
-</script>
+    }
+
+    // Load news via fetch
+    function loadNews() {
+      const container = document.getElementById("news-feed");
+      container.innerHTML = "Loading...";
+      fetch("/get_news")
+        .then(response => response.json())
+        .then(data => {
+          container.innerHTML = "";
+          data.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "news-item";
+            div.innerHTML = `<b>[${item.source}]</b> <a href="${item.url}" target="_blank" title="${item.title}">${item.title}</a>`;
+            container.appendChild(div);
+          });
+        })
+        .catch(error => {
+          container.innerHTML = "⚠️ Failed to load news.";
+          console.error(error);
+        });
+    }
+  </script>
+</body>
+</html>
