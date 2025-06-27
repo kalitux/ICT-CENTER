@@ -1,25 +1,25 @@
 from flask import Flask, render_template, jsonify
-from bs4 import BeautifulSoup
 import requests
-from datetime import datetime
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-# ✅ Killzone logic
+# 🕐 Killzone detection
+from datetime import datetime
 def in_killzone():
     h = datetime.utcnow().hour
     if 7 <= h < 10: return "London"
     if 12 <= h < 15: return "New York"
     return "Inactive"
 
-# ✅ Dummy dashboard data
+# 📊 Main dashboard data
 dashboard_data = [
     {"pair":"USD/CHF","bias1h":"Bullish","thirty":"","setup15m":"In Discount","fvg":"Yes","ob":"Yes","smt":"Yes","macd":[],"status":"🟢 Ready"},
     {"pair":"EUR/CHF","bias1h":"Bearish","thirty":"","setup15m":"In Premium","fvg":"No","ob":"Yes","smt":"No","macd":[],"status":"🟡 Watching"},
     {"pair":"CHF/JPY","bias1h":"Bearish","thirty":"","setup15m":"Retracement Zone","fvg":"Yes","ob":"No","smt":"Yes","macd":[],"status":"🔴 Not Ready"}
 ]
 
-# ✅ Static market event explanations
+# 📉 Market events & reasons
 market_events = [
     {
         "event":"Swiss National Bank Rate Cut",
@@ -63,12 +63,12 @@ market_events = [
     }
 ]
 
-# ✅ CHF News Scraper
+# 🔁 CHF News Function + Endpoint
 def fetch_chf_news():
     headlines = []
     try:
-        r = requests.get("https://www.bloomberg.com/search?query=chf")
-        soup = BeautifulSoup(r.text, "html.parser")
+        bloom = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5)
+        soup = BeautifulSoup(bloom.text, "html.parser")
         for a in soup.select("a[data-testid='search-result-story']")[:5]:
             title = a.get_text(strip=True)
             link = "https://www.bloomberg.com" + a['href']
@@ -77,8 +77,8 @@ def fetch_chf_news():
         headlines.append({"source": "Bloomberg", "title": "⚠️ Failed to load", "url": "#"})
 
     try:
-        r = requests.get("https://www.fxstreet.com/news/tag/chf")
-        soup = BeautifulSoup(r.text, "html.parser")
+        fx = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5)
+        soup = BeautifulSoup(fx.text, "html.parser")
         for a in soup.select("a.news-title")[:5]:
             title = a.get_text(strip=True)
             link = "https://www.fxstreet.com" + a['href']
@@ -88,11 +88,16 @@ def fetch_chf_news():
 
     return headlines
 
+@app.route("/get_news")
+def get_news():
+    return jsonify(fetch_chf_news())
+
+# 🧠 Main page route
 @app.route("/")
 def dashboard():
     return render_template("template.html", in_killzone=in_killzone, dashboard_data=dashboard_data, market_events=market_events)
 
-@app.route("/get_news")
-def get_news():
-    return jsonify(fetch_chf_news())
+if __name__ == "__main__":
+    app.run(debug=True)
+
 
