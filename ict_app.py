@@ -105,11 +105,11 @@ def fetch_chf_news():
             "url": "https://fxstreet.com"
         })
 
-    # 🌐 Euronews
+     # 🌐 Euronews (search-based for higher relevance)
     try:
-        r = requests.get("https://www.euronews.com/tag/swiss-franc", timeout=5, headers=headers)
+        r = requests.get("https://www.euronews.com/search?query=chf", timeout=5, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a.m-object__title__link")[:5]
+        found = soup.select("a.m-search__result__link")[:5]
         for a in found:
             title = a.get_text(strip=True)
             link = "https://www.euronews.com" + a['href']
@@ -119,8 +119,8 @@ def fetch_chf_news():
     except:
         headlines.append({
             "source": "Euronews",
-            "title": "Euronews: SNB Rate Cut and CHF Impact",
-            "url": "https://www.euronews.com/tag/swiss-franc"
+            "title": "Euronews: CHF economic insight",
+            "url": "https://www.euronews.com/search?query=chf"
         })
 
     return headlines
