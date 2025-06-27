@@ -7,16 +7,16 @@ app = Flask(__name__)
 
 # 🕐 Killzone logic
 def in_killzone():
-    h = datetime.utcnow().hour
     now_utc = datetime.utcnow()
-    london_time = now_utc + timedelta(hours=1)
-    ny_time = now_utc - timedelta(hours=4)
+    h = now_utc.hour
+    london_label = "London 🕐‣ 3 AM – 6 AM"
+    ny_label = "New York 🕐‣ 8 AM – 11 AM"
 
     if 7 <= h < 10:
-        return f"London – {london_time.strftime('%H:%M')} (UTC+1)"
+        return f"{london_label} ({now_utc.strftime('%H:%M')} UTC)"
     if 12 <= h < 15:
-        return f"New York – {ny_time.strftime('%H:%M')} (UTC-4)"
-    return "Inactive"
+        return f"{ny_label} ({now_utc.strftime('%H:%M')} UTC)"
+    return f"Inactive ({now_utc.strftime('%H:%M')} UTC)"
 
 # 📊 Dashboard Data
 dashboard_data = [
