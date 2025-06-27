@@ -1,1 +1,19 @@
+<h3>📰 CHF News Feed</h3>
+<button onclick="refreshNews()">⏱️ Refresh News</button>
+<ul id="news-list"></ul>
 
+<script>
+function refreshNews() {
+  fetch("/get_news")
+    .then(res => res.json())
+    .then(data => {
+      const newsList = document.getElementById("news-list");
+      newsList.innerHTML = "";
+      data.forEach(item => {
+        let li = document.createElement("li");
+        li.innerHTML = `<b>[${item.source}]</b> <a href="${item.url}" target="_blank">${item.title}</a>`;
+        newsList.appendChild(li);
+      });
+    });
+}
+</script>
