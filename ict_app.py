@@ -66,34 +66,73 @@ market_events = [
 # 🔁 CHF News Function + Endpoint
 def fetch_chf_news():
     headlines = []
+    headers = {"User-Agent": "Mozilla/5.0"}
 
+    # 🌐 Bloomberg
     try:
-        r = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5)
+        r = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a[data-testid='search-result-story']")[:5]
-        for a in found:
+        for a in soup.select("a[data-testid='search-result-story']")[:5]:
             title = a.get_text(strip=True)
             link = "https://www.bloomberg.com" + a['href']
             headlines.append({"source": "Bloomberg", "title": title, "url": link})
-        if not headlines:
-            raise Exception("No bloomberg results")
     except:
-        # Fallback
-        headlines.append({"source": "Bloomberg", "title": "CHF weakens after SNB comments", "url": "https://bloomberg.com"})
+        headlines.append({"source": "Bloomberg", "title": "⚠️ Bloomberg CHF feed unavailable", "url": "#"})
 
+    # 🌐 FXStreet
     try:
-        r = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5)
+        r = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a.news-title")[:5]
-        for a in found:
+        for a in soup.select("a.news-title")[:5]:
             title = a.get_text(strip=True)
             link = "https://www.fxstreet.com" + a['href']
             headlines.append({"source": "FXStreet", "title": title, "url": link})
-        if not found:
-            raise Exception("No fxstreet results")
     except:
-        # Fallback
-        headlines.append({"source": "FXStreet", "title": "FXStreet: CHF slides post CPI", "url": "https://fxstreet.com"})
+        headlines.append({"source": "FXStreet", "title": "⚠️ FXStreet CHF feed unavailable", "url": "#"})
+
+    # 🌐 ForexLive
+    try:
+        r = requests.get("https://www.forexlive.com/Tags/chf/", timeout=5, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a.tag-article-title")[:5]:
+            title = a.get_text(strip=True)
+            link = "https://www.forexlive.com" + a['href']
+            headlines.append({"source": "ForexLive", "title": title, "url": link})
+    except:
+        headlines.append({"source": "ForexLive", "title": "⚠️ ForexLive CHF feed unavailable", "url": "#"})
+
+    # 🌐 Euronews
+    try:
+        r = requests.get("https://www.euronews.com/tag/swiss-franc", timeout=5, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a.m-object__title__link")[:5]:
+            title = a.get_text(strip=True)
+            link = "https://www.euronews.com" + a['href']
+            headlines.append({"source": "Euronews", "title": title, "url": link})
+    except:
+        headlines.append({"source": "Euronews", "title": "⚠️ Euronews CHF feed unavailable", "url": "#"})
+
+    # 🌐 Economies.com
+    try:
+        r = requests.get("https://www.economies.com/news/tag/CHF", timeout=5, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("div.details > h3 > a")[:5]:
+            title = a.get_text(strip=True)
+            link = "https://www.economies.com" + a['href']
+            headlines.append({"source": "Economies.com", "title": title, "url": link})
+    except:
+        headlines.append({"source": "Economies.com", "title": "⚠️ Economies.com CHF feed unavailable", "url": "#"})
+
+    # 🌐 DailyForex
+    try:
+        r = requests.get("https://www.dailyforex.com/search-results?search=chf", timeout=5, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("div.search-post h3 a")[:5]:
+            title = a.get_text(strip=True)
+            link = "https://www.dailyforex.com" + a['href']
+            headlines.append({"source": "DailyForex", "title": title, "url": link})
+    except:
+        headlines.append({"source": "DailyForex", "title": "⚠️ DailyForex CHF feed unavailable", "url": "#"})
 
     return headlines
 
