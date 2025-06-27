@@ -31,40 +31,27 @@ def fetch_chf_news():
 
     headers = {"User-Agent": "Mozilla/5.0"}
 
-    # 🌐 Bloomberg
+  # 🌐 TradingView News
     try:
-        r = requests.get("https://www.bloomberg.com/search?query=chf", timeout=5, headers=headers)
+        r = requests.get("https://www.tradingview.com/news/", timeout=5, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a[data-testid='search-result-story']")[:5]
-        for a in found:
+        found = []
+        for a in soup.select("a.tv-widget-news__item"):
             title = a.get_text(strip=True)
-            link = "https://www.bloomberg.com" + a['href']
-            headlines.append({"source": "Bloomberg", "title": title, "url": link})
-        if not found:
-            raise Exception("No bloomberg results")
-    except:
-        headlines.append({
-            "source": "Bloomberg",
-            "title": "CHF weakens after SNB comments",
-            "url": "https://bloomberg.com"
-        })
+            link = "https://www.tradingview.com" + a['href']
+            if any(tag in title.lower() for tag in ['swiss', 'chf', 'franc']):
+                found.append({"source": "TradingView", "title": title, "url": link})
+            if len(found) >= 5:
+                break
 
-    # 🌐 FXStreet
-    try:
-        r = requests.get("https://www.fxstreet.com/news/tag/chf", timeout=5, headers=headers)
-        soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a.news-title")[:5]
-        for a in found:
-            title = a.get_text(strip=True)
-            link = "https://www.fxstreet.com" + a['href']
-            headlines.append({"source": "FXStreet", "title": title, "url": link})
         if not found:
-            raise Exception("No fxstreet results")
+            raise Exception("No CHF-related TradingView articles found")
+        headlines.extend(found)
     except:
         headlines.append({
-            "source": "FXStreet",
-            "title": "FXStreet: CHF slides post CPI",
-            "url": "https://fxstreet.com"
+            "source": "TradingView",
+            "title": "TradingView: General market updates",
+            "url": "https://www.tradingview.com/news/"
         })
 
     # 🌐 Euronews (with content filtering)
@@ -96,24 +83,6 @@ def fetch_chf_news():
             "url": "https://www.euronews.com/tag/swiss-franc"
         })
         
-            # 🌐 MarketPulse
-    try:
-        r = requests.get("https://www.marketpulse.com/?s=chf", timeout=5, headers=headers)
-        soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("h2.entry-title > a")[:5]
-        for a in found:
-            title = a.get_text(strip=True)
-            link = a['href']
-            headlines.append({"source": "MarketPulse", "title": title, "url": link})
-        if not found:
-            raise Exception("No MarketPulse results")
-    except:
-        headlines.append({
-            "source": "MarketPulse",
-            "title": "MarketPulse: CHF macro updates",
-            "url": "https://www.marketpulse.com/?s=chf"
-        })
-
     return headlines
 
 @app.route("/")
