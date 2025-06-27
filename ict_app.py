@@ -105,22 +105,51 @@ def fetch_chf_news():
             "url": "https://fxstreet.com"
         })
 
-     # 🌐 Euronews (search-based for higher relevance)
+    # 🌐 Euronews (with content filtering)
     try:
-        r = requests.get("https://www.euronews.com/search?query=chf", timeout=5, headers=headers)
+        r = requests.get("https://www.euronews.com/tag/swiss-franc", timeout=5, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        found = soup.select("a.m-search__result__link")[:5]
-        for a in found:
+        keywords = ['snb', 'rate', 'currency', 'chf', 'franc', 'inflation', 'hike', 'cut', 'economy']
+        excludes = ['stablecoin', 'village', 'move', 'crypto', 'expat', 'family']
+
+        found = []
+        for a in soup.select("a.m-object__title__link"):
             title = a.get_text(strip=True)
+            if not any(kw in title.lower() for kw in keywords):
+                continue
+            if any(bad in title.lower() for bad in excludes):
+                continue
             link = "https://www.euronews.com" + a['href']
-            headlines.append({"source": "Euronews", "title": title, "url": link})
+            found.append({"source": "Euronews", "title": title, "url": link})
+            if len(found) >= 5:
+                break
+
         if not found:
-            raise Exception("No euronews results")
+            raise Exception("Filtered out irrelevant Euronews headlines")
+        headlines.extend(found)
     except:
         headlines.append({
             "source": "Euronews",
-            "title": "Euronews: CHF economic insight",
-            "url": "https://www.euronews.com/search?query=chf"
+            "title": "Euronews: CHF economy coverage (filtered)",
+            "url": "https://www.euronews.com/tag/swiss-franc"
+        })
+        
+            # 🌐 MarketPulse
+    try:
+        r = requests.get("https://www.marketpulse.com/?s=chf", timeout=5, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        found = soup.select("h2.entry-title > a")[:5]
+        for a in found:
+            title = a.get_text(strip=True)
+            link = a['href']
+            headlines.append({"source": "MarketPulse", "title": title, "url": link})
+        if not found:
+            raise Exception("No MarketPulse results")
+    except:
+        headlines.append({
+            "source": "MarketPulse",
+            "title": "MarketPulse: CHF macro updates",
+            "url": "https://www.marketpulse.com/?s=chf"
         })
 
     return headlines
