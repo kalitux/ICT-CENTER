@@ -79,8 +79,10 @@ def webhook():
     for row in dashboard_data:
         if row["pair"] == pair:
             if tf == "15M":
-                row["macd"] = f"{'🔵' if div == 'Bullish' else '🟠'} {div}"
-                row["status"] = "<span class='status-box green'>🟢 Ready</span>" if div == "Bullish" else "<span class='status-box red'>🔴 Not Ready</span>"
+                timestamp = datetime.utcnow().strftime('%H:%M')
+                label = f"{'🔵' if div == 'Bullish' else '🟠'} {div} ({timestamp} UTC)"
+                row["macd"] = f"<span class='live-macd'>{label}</span>"
+                row["status"] = "<span class='status-box green'>🟢 Ready</span>"
             break
 
     return jsonify({"message": "MACD divergence updated"})
