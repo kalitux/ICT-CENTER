@@ -5,11 +5,18 @@ from bs4 import BeautifulSoup
 app = Flask(__name__)
 
 # 🕐 Killzone detection
-from datetime import datetime
+from datetime import datetime, timedelta
+
 def in_killzone():
     h = datetime.utcnow().hour
-    if 7 <= h < 10: return "London"
-    if 12 <= h < 15: return "New York"
+    now_utc = datetime.utcnow()
+    london_time = now_utc + timedelta(hours=1)  # London = UTC+1
+    ny_time = now_utc - timedelta(hours=4)      # New York = UTC-4
+
+    if 7 <= h < 10:
+        return f"London – {london_time.strftime('%H:%M')} (UTC+1)"
+    if 12 <= h < 15:
+        return f"New York – {ny_time.strftime('%H:%M')} (UTC-4)"
     return "Inactive"
 
 # 📊 Main dashboard data
